@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Script to send all server's current processes' used memory to a StatsD server
+# Written by: Harry Park
+# Last Updated on: July 11, 2020
+#----------------------------------------------------------------------
+
+#/ Usage: output_used_memory_to_statsd
+
+# TODO make this an option to adjust
+PARALLELISM=300
+
+# Bash options for strict error checking
+#set -o errexit -o errtrace -o pipefail -o nounset
+#shopt -s inherit_errexit 2>/dev/null || true
+
+# Self path
+SELF_FILE="$(basename "${BASH_SOURCE[0]}")" # File name
+SELF_DIR="$(dirname "${BASH_SOURCE[0]}")" # Dir name, assumes process script is in same dir
+
+# Log functions
+readonly LOG_FILE="/tmp/${SELF_FILE}.log"
+info()    { echo "[INFO]    $*" | tee -a "$LOG_FILE" >&2 ; }
+warning() { echo "[WARNING] $*" | tee -a "$LOG_FILE" >&2 ; }
+error()   { echo "[ERROR]   $*" | tee -a "$LOG_FILE" >&2 ; }
+fatal()   { echo "[FATAL]   $*" | tee -a "$LOG_FILE" >&2 ; exit 1 ; }
+
+# Help message (extracted from script headers)
+usage() { grep '^#/' "$0" | cut --characters=4-; exit 0; }
+REGEX='(^|\W)(-h|--help)($|\W)'
+if [[ "$*" =~ $REGEX ]]; then usage; fi
+
+main(){
+  info "$SELF_FILE run on `date +'%Y%m%d %H%M %p'`"
+  # list the processes,
+  # extract the pids and process names
+  # send the 2 args to the script in parallel, order doesn't matter
+  ps -e \
+  | awk '{printf "%s %d\n", $4, $1}' \
+  | xargs -n 2 -P $PARALLELISM ${SELF_DIR}/process_mem_to_statsd
+
+  info "complete"
+}
+
+main "@$"
