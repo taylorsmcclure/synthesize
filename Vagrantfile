@@ -14,4 +14,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 3000, host: 3030
   graphite_version = ENV['GRAPHITE_RELEASE'].nil? ? '1.1.7' : ENV['GRAPHITE_RELEASE']
   config.vm.provision "shell", inline: "cd /vagrant; GRAPHITE_RELEASE=#{graphite_version} ./install"
+  config.vm.provision "file", source: "templates/scripts/statsite-sink-graphite.py", destination: "/usr/local/sbin/statsite-sink-graphite.py"
 end
