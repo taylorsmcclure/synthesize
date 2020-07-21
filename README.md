@@ -1,18 +1,34 @@
-Synthesize
+Epic Games Embedded DevOps Exercise
 ==========
 
-[![Install on DigitalOcean](http://synthesize-do-install.herokuapp.com/button.svg)](http://synthesize-do-install.herokuapp.com/install?url=https://github.com/obfuscurity/synthesize)
+This Synthesize branch has the scripts created for Question 1. After finishing
+up the questions 2-4, I decided to go back and run the script as a service in
+systemd. This is working and it sends off to Graphite every 2 seconds.
 
-Installing Graphite doesn't have to be difficult. The `install` script in synthesize is designed to make it brain-dead easy to install Graphite and related services onto a modern Linux distribution.
+## Scripts created
 
-Synthesize is built to run on Ubuntu 18.04 LTS. It will __not__ run on other Ubuntu releases or Linux distributions. The goal of this project is not to become an automation alternative to modern configuration management utilities (e.g. Chef or Puppet), but rather, to make it as easy as possible for the beginner Graphite user to get started and familiar with the project without having to learn a suite of other automation and/or infrastructure-related projects.
+### memory_reporter
+A simple script that provides the metric server ip and loops
 
-The resulting Graphite web interface __listens only on https port 443__ and has been configured to collect metrics specifically for helping profile the performance of your Graphite and Carbon services. It uses memcached for improved query performance, and Statsite for a fast, C-based implementation of the StatsD collector/aggregator.
+### output_used_memory_to_statsd
 
-Beginning with version 3.0.0 we've also incorporated the Grafana dashboard project, a modern and full-featured alternative to Graphite's built-in Composer and Dashboard interfaces. It also includes a default dashboard for monitoring Carbon's internal statistics.
+This shell script calls ps and then parallelizes the statsd calls
 
-:warning: **WARNING:** You should not install Synthesize directly on your personal development system. It's strongly suggested that you use a VM or other temporary VPS instance for sandboxing Synthesize.
+### process_mem_to_statsd
 
+This shell script looks up used memory and sends the info to statsd
+
+### Usage:
+
+Download or clone the repo on the eg-script fork
+```
+$ cd synthesize
+$ vagrant up
+```
+Then you can go to [Graphite](localhost:8443) and see the stats roll in under
+Metrics.statsite.counts.numStats
+
+# Synthesize readme below
 ## Provides
 
 * Graphite 1.1.x ([graphite-web](https://github.com/graphite-project/graphite-web), [carbon](https://github.com/graphite-project/carbon), [whisper](https://github.com/graphite-project/whisper))
@@ -108,4 +124,3 @@ $ vagrant destroy
 ## License
 
 Synthesize is distributed under the MIT license.
-
